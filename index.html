@@ -1,1 +1,1452 @@
-שניר ומיכל אוהבים נקניקיות
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>דשבורד ניתוח נתונים | שניר ומיכל</title>
+    <script src="https://public.tableau.com/javascripts/api/tableau-2.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fontsource/assistant@5.0.19/index.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6C3CE1;
+            --primary-light: #8B5CF6;
+            --secondary: #F59E0B;
+            --dark: #1E1B4B;
+            --darker: #0F0A2E;
+            --light: #F8F7FF;
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --gradient-1: linear-gradient(135deg, #6C3CE1 0%, #A855F7 50%, #EC4899 100%);
+            --gradient-2: linear-gradient(135deg, #0F0A2E 0%, #1E1B4B 50%, #312E81 100%);
+            --gradient-3: linear-gradient(135deg, #F59E0B 0%, #EF4444 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Assistant', sans-serif;
+            background: var(--darker);
+            color: #E2E0F0;
+            overflow-x: hidden;
+            line-height: 1.8;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .bg-animation .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: floatOrb 20s ease-in-out infinite;
+        }
+
+        .bg-animation .orb:nth-child(1) {
+            width: 600px;
+            height: 600px;
+            background: var(--primary);
+            top: -200px;
+            right: -200px;
+            animation-delay: 0s;
+        }
+
+        .bg-animation .orb:nth-child(2) {
+            width: 400px;
+            height: 400px;
+            background: #EC4899;
+            bottom: -100px;
+            left: -100px;
+            animation-delay: -7s;
+        }
+
+        .bg-animation .orb:nth-child(3) {
+            width: 300px;
+            height: 300px;
+            background: var(--secondary);
+            top: 50%;
+            left: 50%;
+            animation-delay: -14s;
+        }
+
+        @keyframes floatOrb {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(50px, -80px) scale(1.1); }
+            50% { transform: translate(-30px, 60px) scale(0.9); }
+            75% { transform: translate(70px, 30px) scale(1.05); }
+        }
+
+        /* Particle Canvas */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Main Content */
+        .content {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 1rem 2rem;
+            backdrop-filter: blur(20px);
+            background: rgba(15, 10, 46, 0.7);
+            border-bottom: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            padding: 0.7rem 2rem;
+            background: rgba(15, 10, 46, 0.9);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-logo svg {
+            width: 36px;
+            height: 36px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #C4C1D6;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            padding-bottom: 4px;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-1);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #fff;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 5px;
+        }
+
+        .hamburger span {
+            width: 28px;
+            height: 2px;
+            background: #fff;
+            transition: all 0.3s ease;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+        }
+
+        .hero-inner {
+            max-width: 900px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.25rem;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            font-size: 0.9rem;
+            color: var(--secondary);
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .hero-badge .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--secondary);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.5); }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+        .hero h1 .gradient-text {
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: #A8A5C0;
+            max-width: 700px;
+            margin: 0 auto 2.5rem;
+            animation: fadeInUp 0.8s ease 0.4s both;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease 0.6s both;
+        }
+
+        .btn {
+            padding: 0.875rem 2rem;
+            border-radius: 12px;
+            font-family: 'Assistant', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--gradient-1);
+            color: #fff;
+            box-shadow: 0 4px 25px rgba(108, 60, 225, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 35px rgba(108, 60, 225, 0.5);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #E2E0F0;
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-outline:hover {
+            background: var(--glass);
+            border-color: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        .scroll-indicator svg {
+            width: 30px;
+            height: 30px;
+            color: var(--primary-light);
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        /* Stats Section */
+        .stats {
+            padding: 4rem 2rem;
+            position: relative;
+        }
+
+        .stats-grid {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+            animation: fadeInUp 0.8s ease both;
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-light);
+            box-shadow: 0 10px 40px rgba(108, 60, 225, 0.2);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 1rem;
+            background: var(--gradient-1);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-icon svg {
+            width: 24px;
+            height: 24px;
+            color: #fff;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: #A8A5C0;
+            font-size: 0.95rem;
+        }
+
+        /* About Section */
+        .about {
+            padding: 6rem 2rem;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 4rem;
+        }
+
+        .section-tag {
+            display: inline-block;
+            padding: 0.35rem 1rem;
+            background: rgba(108, 60, 225, 0.15);
+            border: 1px solid rgba(108, 60, 225, 0.3);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--primary-light);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            letter-spacing: 1px;
+        }
+
+        .section-header h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            color: #A8A5C0;
+            font-size: 1.1rem;
+        }
+
+        .about-grid {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .about-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: var(--gradient-1);
+            opacity: 0.1;
+            border-radius: 0 24px 0 100%;
+        }
+
+        .about-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-light);
+            box-shadow: 0 10px 40px rgba(108, 60, 225, 0.15);
+        }
+
+        .about-card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .about-card:nth-child(1) .about-card-icon { background: linear-gradient(135deg, rgba(108,60,225,0.2), rgba(168,85,247,0.2)); }
+        .about-card:nth-child(2) .about-card-icon { background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(239,68,68,0.2)); }
+        .about-card:nth-child(3) .about-card-icon { background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(59,130,246,0.2)); }
+
+        .about-card h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .about-card p {
+            color: #A8A5C0;
+            line-height: 1.9;
+        }
+
+        /* Dashboard Section */
+        .dashboard {
+            padding: 6rem 2rem;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tableau-wrapper {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .tableau-header {
+            padding: 1.25rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .tableau-header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .window-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .window-dots span {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .window-dots span:nth-child(1) { background: #EF4444; }
+        .window-dots span:nth-child(2) { background: #F59E0B; }
+        .window-dots span:nth-child(3) { background: #10B981; }
+
+        .tableau-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #C4C1D6;
+        }
+
+        .tableau-body {
+            padding: 1rem;
+        }
+
+        #tableauViz {
+            min-height: 700px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        /* Benefits Section */
+        .benefits {
+            padding: 6rem 2rem;
+        }
+
+        .benefits-grid {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .benefit-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .benefit-item:hover {
+            border-color: var(--primary-light);
+            transform: translateX(5px);
+        }
+
+        .benefit-check {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(59,130,246,0.2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 0.25rem;
+        }
+
+        .benefit-check svg {
+            width: 18px;
+            height: 18px;
+            color: #10B981;
+        }
+
+        .benefit-text h4 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+
+        .benefit-text p {
+            color: #A8A5C0;
+            font-size: 0.9rem;
+        }
+
+        /* Charts Info Section */
+        .charts-info {
+            padding: 6rem 2rem;
+        }
+
+        .charts-grid {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .chart-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+        }
+
+        .chart-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(108, 60, 225, 0.15);
+        }
+
+        .chart-card-visual {
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-card:nth-child(1) .chart-card-visual { background: linear-gradient(135deg, rgba(108,60,225,0.15), rgba(168,85,247,0.1)); }
+        .chart-card:nth-child(2) .chart-card-visual { background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(239,68,68,0.1)); }
+        .chart-card:nth-child(3) .chart-card-visual { background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(59,130,246,0.1)); }
+
+        .chart-card-visual svg {
+            width: 80px;
+            height: 80px;
+            opacity: 0.6;
+        }
+
+        .chart-card-body {
+            padding: 2rem;
+        }
+
+        .chart-card-body h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .chart-card-body p {
+            color: #A8A5C0;
+            line-height: 1.9;
+        }
+
+        /* Credit Section */
+        .credit {
+            padding: 6rem 2rem;
+        }
+
+        .credit-card {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 3rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .credit-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(108,60,225,0.1), transparent, rgba(236,72,153,0.1), transparent);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
+        }
+
+        .credit-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .credit-avatars {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .credit-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .credit-avatar:nth-child(1) {
+            background: var(--gradient-1);
+            box-shadow: 0 4px 20px rgba(108,60,225,0.4);
+        }
+
+        .credit-avatar:nth-child(2) {
+            background: var(--gradient-3);
+            box-shadow: 0 4px 20px rgba(245,158,11,0.4);
+        }
+
+        .credit-card h3 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .credit-card .subtitle {
+            color: var(--secondary);
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .credit-card p {
+            color: #A8A5C0;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .credit-divider {
+            width: 60px;
+            height: 3px;
+            background: var(--gradient-1);
+            border-radius: 2px;
+            margin: 1.5rem auto;
+        }
+
+        /* Footer */
+        footer {
+            padding: 3rem 2rem;
+            border-top: 1px solid var(--glass-border);
+            text-align: center;
+        }
+
+        .footer-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.75rem;
+        }
+
+        footer p {
+            color: #6B6888;
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--primary-light);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(15, 10, 46, 0.95);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 1rem 2rem;
+                gap: 1rem;
+                border-bottom: 1px solid var(--glass-border);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .hero {
+                padding: 7rem 1.5rem 4rem;
+            }
+
+            .hero p {
+                font-size: 1.05rem;
+            }
+
+            #tableauViz {
+                min-height: 500px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .about-grid,
+            .benefits-grid,
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 280px;
+                justify-content: center;
+            }
+        }
+
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Selection */
+        ::selection {
+            background: var(--primary);
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
+
+    <canvas id="particles"></canvas>
+
+    <!-- Main Content -->
+    <div class="content">
+
+        <!-- Navigation -->
+        <nav id="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <svg viewBox="0 0 36 36" fill="none">
+                        <rect width="36" height="36" rx="8" fill="url(#logoGrad)"/>
+                        <path d="M10 18L16 12L22 18L16 24Z" fill="white" opacity="0.9"/>
+                        <path d="M16 18L22 12L28 18L22 24Z" fill="white" opacity="0.6"/>
+                        <defs>
+                            <linearGradient id="logoGrad" x1="0" y1="0" x2="36" y2="36">
+                                <stop stop-color="#6C3CE1"/>
+                                <stop offset="1" stop-color="#EC4899"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    שניר & מיכל
+                </div>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="#home">דף הבית</a></li>
+                    <li><a href="#about">אודות</a></li>
+                    <li><a href="#dashboard">הדשבורד</a></li>
+                    <li><a href="#benefits">יתרונות</a></li>
+                    <li><a href="#charts">התרשימים</a></li>
+                    <li><a href="#credit">קרדיט</a></li>
+                </ul>
+                <button class="hamburger" id="hamburger" aria-label="תפריט">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="hero-inner">
+                <div class="hero-badge">
+                    <span class="dot"></span>
+                    מערכת ניתוח נתונים מתקדמת
+                </div>
+                <h1>
+                    תובנות עסקיות<br>
+                    <span class="gradient-text">במבט אחד</span>
+                </h1>
+                <p>
+                    פלטפורמת ניתוח נתונים אינטראקטיבית המאפשרת לצלול לעומק המידע, 
+                    לזהות מגמות, ולקבל החלטות חכמות מבוססות נתונים בזמן אמת
+                </p>
+                <div class="hero-buttons">
+                    <a href="#dashboard" class="btn btn-primary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                        צפה בדשבורד
+                    </a>
+                    <a href="#about" class="btn btn-outline">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                        למידע נוסף
+                    </a>
+                </div>
+            </div>
+            <div class="scroll-indicator">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M19 12l-7 7-7-7"/></svg>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats" id="stats">
+            <div class="stats-grid">
+                <div class="stat-card fade-in">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+                    </div>
+                    <div class="stat-number" data-target="100">0%</div>
+                    <div class="stat-label">נתונים בזמן אמת</div>
+                </div>
+                <div class="stat-card fade-in">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </div>
+                    <div class="stat-number" data-target="360">0°</div>
+                    <div class="stat-label">תצוגה מקיפה</div>
+                </div>
+                <div class="stat-card fade-in">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+                    </div>
+                    <div class="stat-number" data-target="5">0</div>
+                    <div class="stat-label">תרשימים אינטראקטיביים</div>
+                </div>
+                <div class="stat-card fade-in">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+                    </div>
+                    <div class="stat-number" data-target="100">0%</div>
+                    <div class="stat-label">אבטחת מידע</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="about" id="about">
+            <div class="section-header fade-in">
+                <span class="section-tag">אודות המערכת</span>
+                <h2>מהות הדשבורד ותועלותיו</h2>
+                <p>
+                    מערכת ניתוח הנתונים שלנו מאפשרת להפוך מידע גולמי לתובנות עסקיות משמעותיות, 
+                    המסייעות בקבלת החלטות אסטרטגיות
+                </p>
+            </div>
+            <div class="about-grid">
+                <div class="about-card fade-in">
+                    <div class="about-card-icon">📊</div>
+                    <h3>ניתוח מעמיק</h3>
+                    <p>
+                        הדשבורד מציג ניתוח רב-ממדי של הנתונים, המאפשר לזהות קשרים סמויים, 
+                        מגמות משתנות והזדמנויות עסקיות שלא היו נראות לעין בסקירה שטחית. 
+                        כל תרשים מעוצב כך שיספק את המידע הרלוונטי ביותר.
+                    </p>
+                </div>
+                <div class="about-card fade-in">
+                    <div class="about-card-icon">⚡</div>
+                    <h3>זמן אמת</h3>
+                    <p>
+                        הנתונים מתעדכנים באופן שוטף ומאפשרים מעקב רציף אחר ביצועים. 
+                        יכולות הסינון והאינטראקטיביות מאפשרות להעמיק בכל נקודת מידע, 
+                        לחקור חריגות, ולזהות דפוסים בזמן אמת.
+                    </p>
+                </div>
+                <div class="about-card fade-in">
+                    <div class="about-card-icon">🎯</div>
+                    <h3>החלטות חכמות</h3>
+                    <p>
+                        המערכת מספקת תובנות המאפשרות קבלת החלטות מבוססות נתונים, 
+                        צמצום סיכונים, ומקסום ההזדמנויות. התרשימים האינטואיטיביים 
+                        מאפשרים לכל משתמש, ללא תלות ברקע טכני, להפיק תובנות משמעותיות.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Section -->
+        <section class="dashboard" id="dashboard">
+            <div class="dashboard-container">
+                <div class="section-header fade-in">
+                    <span class="section-tag">הדשבורד</span>
+                    <h2>תרשים Tableau Public</h2>
+                    <p>
+                        הדשבורד האינטראקטיבי הבא מציג את הנתונים בצורה ויזואלית ברורה ומקצועית. 
+                        ניתן לסנן, לחקור ולנתח את המידע באופן חופשי
+                    </p>
+                </div>
+                <div class="tableau-wrapper fade-in">
+                    <div class="tableau-header">
+                        <div class="tableau-header-left">
+                            <div class="window-dots">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <span class="tableau-title">Snir & Michal Dashboard</span>
+                        </div>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A8A5C0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+                    </div>
+                    <div class="tableau-body">
+                        <div id="tableauViz"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Benefits Section -->
+        <section class="benefits" id="benefits">
+            <div class="section-header fade-in">
+                <span class="section-tag">יתרונות המערכת</span>
+                <h2>למה לבחור בדשבורד שלנו?</h2>
+                <p>
+                    מערכת ניתוח הנתונים שלנו מצוידת במגוון רחב של יכולות המאפשרות 
+                    הפקת ערך מקסימלי מהמידע
+                </p>
+            </div>
+            <div class="benefits-grid">
+                <div class="benefit-item fade-in">
+                    <div class="benefit-check">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <div class="benefit-text">
+                        <h4>ממשק אינטואיטיבי</h4>
+                        <p>עיצוב נקי וברור המאפשר ניווט קל ומהיר בין הנתונים</p>
+                    </div>
+                </div>
+                <div class="benefit-item fade-in">
+                    <div class="benefit-check">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <div class="benefit-text">
+                        <h4>סינון מתקדם</h4>
+                        <p>יכולת סינון וחיתוך נתונים לפי פרמטרים מרובים</p>
+                    </div>
+                </div>
+                <div class="benefit-item fade-in">
+                    <div class="benefit-check">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <div class="benefit-text">
+                        <h4>ויזואליזציה מתקדמת</h4>
+                        <p>תרשימים מקצועיים הממחישים את הנתונים בצורה ברורה</p>
+                    </div>
+                </div>
+                <div class="benefit-item fade-in">
+                    <div class="benefit-check">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <div class="benefit-text">
+                        <h4>נגישות מלאה</h4>
+                        <p>זמין מכל מכשיר עם חיבור לאינטרנט, ללא צורך בהתקנה</p>
+                    </div>
+                </div>
+                <div class="benefit-item fade-in">
+                    <div class="benefit-check">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <div class="benefit-text">
+                        <h4>עדכון אוטומטי</h4>
+                        <p>הנתונים מתעדכנים באופן שוטף ללא התערבות ידנית</p>
+                    </div>
+                </div>
+                <div class="benefit-item fade-in">
+                    <div class="benefit-check">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <div class="benefit-text">
+                        <h4>אינטראקטיביות מלאה</h4>
+                        <p>יכולת לחקור כל נקודת מידע לעומק עם כלים מתקדמים</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts Info Section -->
+        <section class="charts-info" id="charts">
+            <div class="section-header fade-in">
+                <span class="section-tag">מהות התרשימים</span>
+                <h2>סוגי התרשימים המוצגים</h2>
+                <p>
+                    הדשבורד כולל מגוון תרשימים מקצועיים, כל אחד נבחר בקפידה 
+                    כדי להציג את ההיבט הרלוונטי ביותר של הנתונים
+                </p>
+            </div>
+            <div class="charts-grid">
+                <div class="chart-card fade-in">
+                    <div class="chart-card-visual">
+                        <svg viewBox="0 0 80 80" fill="none">
+                            <rect x="8" y="50" width="12" height="22" rx="2" fill="#6C3CE1" opacity="0.8"/>
+                            <rect x="26" y="35" width="12" height="37" rx="2" fill="#8B5CF6" opacity="0.8"/>
+                            <rect x="44" y="20" width="12" height="52" rx="2" fill="#A855F7" opacity="0.8"/>
+                            <rect x="62" y="8" width="12" height="64" rx="2" fill="#EC4899" opacity="0.8"/>
+                        </svg>
+                    </div>
+                    <div class="chart-card-body">
+                        <h3>תרשימי עמודות</h3>
+                        <p>
+                            מאפשרים השוואה ויזואלית בין קטגוריות שונות. 
+                            אידיאליים להצגת מגמות, זיהוי חריגות, 
+                            והשוואת ביצועים בין יחידות שונות בזמן אמת.
+                        </p>
+                    </div>
+                </div>
+                <div class="chart-card fade-in">
+                    <div class="chart-card-visual">
+                        <svg viewBox="0 0 80 80" fill="none">
+                            <circle cx="40" cy="40" r="30" stroke="#F59E0B" stroke-width="3" fill="none" opacity="0.3"/>
+                            <path d="M40 10 A30 30 0 0 1 70 40" stroke="#EF4444" stroke-width="4" fill="none" stroke-linecap="round"/>
+                            <path d="M70 40 A30 30 0 0 1 40 70" stroke="#F59E0B" stroke-width="4" fill="none" stroke-linecap="round"/>
+                            <path d="M40 70 A30 30 0 0 1 10 40" stroke="#6C3CE1" stroke-width="4" fill="none" stroke-linecap="round"/>
+                            <path d="M10 40 A30 30 0 0 1 40 10" stroke="#10B981" stroke-width="4" fill="none" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="chart-card-body">
+                        <h3>תרשימי עוגה ודונאט</h3>
+                        <p>
+                            מציגים את חלוקת האחוזים בין הקטגוריות השונות. 
+                            מאפשרים להבין במבט אחד את חלקו היחסי של כל רכיב 
+                            בסך הכולל, ולזהות את הדומיננטיים ביותר.
+                        </p>
+                    </div>
+                </div>
+                <div class="chart-card fade-in">
+                    <div class="chart-card-visual">
+                        <svg viewBox="0 0 80 80" fill="none">
+                            <polyline points="5,60 20,45 35,50 50,25 65,30 75,15" stroke="#10B981" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="5" cy="60" r="3" fill="#10B981"/>
+                            <circle cx="20" cy="45" r="3" fill="#10B981"/>
+                            <circle cx="35" cy="50" r="3" fill="#10B981"/>
+                            <circle cx="50" cy="25" r="3" fill="#10B981"/>
+                            <circle cx="65" cy="30" r="3" fill="#10B981"/>
+                            <circle cx="75" cy="15" r="3" fill="#10B981"/>
+                        </svg>
+                    </div>
+                    <div class="chart-card-body">
+                        <h3>תרשימי קו ומגמות</h3>
+                        <p>
+                            מציגים שינויים לאורך זמן ומאפשרים לזהות מגמות, 
+                            דפוסים עונתיים, ונקודות מפנה. 
+                            כלי חיוני לניבוי עתידי ותכנון אסטרטגי.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Credit Section -->
+        <section class="credit" id="credit">
+            <div class="credit-card fade-in">
+                <div class="credit-avatars">
+                    <div class="credit-avatar">ש</div>
+                    <div class="credit-avatar">מ</div>
+                </div>
+                <h3>האתר נבנה ופותח על ידי</h3>
+                <div class="subtitle">מר שניר וגברת מיכל</div>
+                <div class="credit-divider"></div>
+                <p>
+                    צוות הפיתוח מסר את כל ליבו ליצירת מערכת ניתוח הנתונים 
+                    המקצועית והאינטואיטיבית ביותר. 
+                    כל רכיב, כל תרשים, וכל פיקסל נבנו מתוך מחשבה על חוויית המשתמש
+                </p>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-inner">
+                <div class="footer-logo">שניר & מיכל</div>
+                <p>
+                    © 2024 כל הזכויות שמורות | פותח באהבה על ידי 
+                    <a href="#credit">מר שניר וגברת מיכל</a>
+                </p>
+                <p style="margin-top: 0.5rem;">
+                    מופעל באמצעות Tableau Public &middot; מתארח ב-GitHub Pages
+                </p>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        // Initialize Tableau Viz
+        function initViz() {
+            var containerDiv = document.getElementById('tableauViz');
+            var url = 'https://public.tableau.com/views/SnirMichalDashboard/SnirMichalDashboard?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link';
+            var options = {
+                hideTabs: true,
+                hideToolbar: false,
+                width: '100%',
+                height: '700px'
+            };
+            var viz = new tableau.Viz(containerDiv, url, options);
+        }
+
+        // Wait for DOM and Tableau API to load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                initViz();
+            });
+        } else {
+            initViz();
+        }
+
+        // Navbar scroll effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Hamburger menu
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+        hamburger.addEventListener('click', function() {
+            navLinks.classList.toggle('active');
+        });
+
+        // Close menu on link click
+        document.querySelectorAll('.nav-links a').forEach(function(link) {
+            link.addEventListener('click', function() {
+                navLinks.classList.remove('active');
+            });
+        });
+
+        // Scroll animations
+        const fadeElements = document.querySelectorAll('.fade-in');
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        fadeElements.forEach(function(el) {
+            observer.observe(el);
+        });
+
+        // Counter animation
+        function animateCounters() {
+            const counters = document.querySelectorAll('.stat-number');
+            counters.forEach(function(counter) {
+                const target = parseInt(counter.getAttribute('data-target'));
+                const suffix = counter.textContent.replace(/[0-9]/g, '');
+                const duration = 2000;
+                const start = performance.now();
+
+                function update(currentTime) {
+                    const elapsed = currentTime - start;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const eased = 1 - Math.pow(1 - progress, 3);
+                    const current = Math.floor(eased * target);
+                    counter.textContent = current + suffix;
+                    if (progress < 1) {
+                        requestAnimationFrame(update);
+                    } else {
+                        counter.textContent = target + suffix;
+                    }
+                }
+
+                requestAnimationFrame(update);
+            });
+        }
+
+        // Trigger counter animation when stats section is visible
+        const statsSection = document.getElementById('stats');
+        const statsObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    animateCounters();
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.3 });
+
+        statsObserver.observe(statsSection);
+
+        // Particle animation
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let animationId;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function createParticles() {
+            particles = [];
+            var count = Math.floor(window.innerWidth / 15);
+            for (var i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.3,
+                    vy: (Math.random() - 0.5) * 0.3,
+                    size: Math.random() * 2 + 0.5,
+                    opacity: Math.random() * 0.5 + 0.1
+                });
+            }
+        }
+
+        function drawParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(function(p) {
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.x < 0) p.x = canvas.width;
+                if (p.x > canvas.width) p.x = 0;
+                if (p.y < 0) p.y = canvas.height;
+                if (p.y > canvas.height) p.y = 0;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(139, 92, 246, ' + p.opacity + ')';
+                ctx.fill();
+            });
+
+            // Draw connections
+            for (var i = 0; i < particles.length; i++) {
+                for (var j = i + 1; j < particles.length; j++) {
+                    var dx = particles[i].x - particles[j].x;
+                    var dy = particles[i].y - particles[j].y;
+                    var dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = 'rgba(139, 92, 246, ' + (0.1 * (1 - dist / 120)) + ')';
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            animationId = requestAnimationFrame(drawParticles);
+        }
+
+        resizeCanvas();
+        createParticles();
+        drawParticles();
+
+        window.addEventListener('resize', function() {
+            resizeCanvas();
+            createParticles();
+        });
+    </script>
+</body>
+</html>
+
