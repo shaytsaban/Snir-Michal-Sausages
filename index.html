@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>דשבורד ניתוח נתונים | שניר ומיכל</title>
     <link href="https://cdn.jsdelivr.net/npm/@fontsource/assistant@5.0.19/index.min.css" rel="stylesheet">
+    
+    <script type="module" src="https://public.tableau.com/javascripts/api/tableau.embedding.3.latest.min.js"></script>
+
     <style>
         :root {
             --primary: #6C3CE1;
@@ -17,7 +20,6 @@
             --glass-border: rgba(255, 255, 255, 0.12);
             --gradient-1: linear-gradient(135deg, #6C3CE1 0%, #A855F7 50%, #EC4899 100%);
             --gradient-2: linear-gradient(135deg, #0F0A2E 0%, #1E1B4B 50%, #312E81 100%);
-            --gradient-3: linear-gradient(135deg, #F59E0B 0%, #EF4444 100%);
         }
 
         * {
@@ -80,3 +82,226 @@
         /* Navigation */
         nav {
             position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 1rem 2rem;
+            backdrop-filter: blur(20px);
+            background: rgba(15, 10, 46, 0.7);
+            border-bottom: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled { padding: 0.7rem 2rem; background: rgba(15, 10, 46, 0.9); }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links { display: flex; gap: 2rem; list-style: none; }
+        .nav-links a { color: #C4C1D6; text-decoration: none; font-weight: 500; position: relative; padding-bottom: 4px; }
+        .nav-links a:hover { color: #fff; }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+        }
+
+        .hero h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 800; line-height: 1.2; margin-bottom: 1.5rem; }
+        .hero h1 .gradient-text { background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* Dashboard Section */
+        .dashboard { padding: 6rem 2rem; }
+        .dashboard-container { max-width: 1200px; margin: 0 auto; }
+
+        .tableau-wrapper {
+            background: #ffffff; /* רקע לבן חיוני לאזור התצוגה */
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .tableau-header {
+            padding: 1.25rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+
+        .window-dots { display: flex; gap: 6px; }
+        .window-dots span { width: 12px; height: 12px; border-radius: 50%; }
+        .window-dots span:nth-child(1) { background: #EF4444; }
+        .window-dots span:nth-child(2) { background: #F59E0B; }
+        .window-dots span:nth-child(3) { background: #10B981; }
+
+        .tableau-body { 
+            padding: 0; 
+            width: 100%; 
+            position: relative; 
+        }
+
+        /* עיצוב התגית של טאבלו */
+        tableau-viz {
+            display: block;
+            width: 100%;
+            height: 800px;
+            margin: 0 auto;
+        }
+
+        /* Sections & Cards Styles */
+        .credit { padding: 4rem 2rem; }
+
+        /* Footer */
+        footer { padding: 3rem 2rem; border-top: 1px solid var(--glass-border); text-align: center; }
+
+        /* Animations */
+        .fade-in { opacity: 0; transform: translateY(30px); transition: all 0.8s ease; }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            tableau-viz { height: 600px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-animation">
+        <div class="orb"></div><div class="orb"></div><div class="orb"></div>
+    </div>
+    <canvas id="particles"></canvas>
+
+    <div class="content">
+        <nav id="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">שניר & מיכל</div>
+                <ul class="nav-links">
+                    <li><a href="#home">דף הבית</a></li>
+                    <li><a href="#dashboard">הדשבורד</a></li>
+                    <li><a href="#credit">קרדיט</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <section class="hero" id="home">
+            <div class="hero-inner">
+                <h1>תובנות עסקיות<br><span class="gradient-text">במבט אחד</span></h1>
+                <p>פלטפורמת ניתוח נתונים אינטראקטיבית מבוססת Tableau</p>
+            </div>
+        </section>
+
+        <section class="dashboard" id="dashboard">
+            <div class="dashboard-container">
+                <div class="tableau-wrapper fade-in">
+                    <div class="tableau-header">
+                        <div class="window-dots"><span></span><span></span><span></span></div>
+                        <span style="color: #64748b; font-weight: 600; font-size: 0.9rem;">Live Analysis Dashboard - Snir & Michal Sales</span>
+                    </div>
+                    
+                    <div class="tableau-body">
+                        <tableau-viz 
+                            id="tableauViz"       
+                            src="https://public.tableau.com/views/SnirMichalSales/Dashboard1"      
+                            hide-tabs="true"
+                            toolbar="bottom">
+                        </tableau-viz>
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+
+        <section class="credit" id="credit">
+            <div style="text-align: center; background: var(--glass); padding: 3rem; border-radius: 24px; border: 1px solid var(--glass-border); max-width: 800px; margin: 0 auto;" class="fade-in">
+                <h3 style="font-size: 1.8rem; margin-bottom: 0.5rem;">האתר פותח על ידי</h3>
+                <div style="color: var(--secondary); font-weight: 600; font-size: 1.1rem; margin-bottom: 1rem;">מר שניר וגברת מיכל</div>
+                <p style="color: #A8A5C0;">© 2024 כל הזכויות שמורות</p>
+            </div>
+        </section>
+
+        <footer>
+            <p>מופעל באמצעות Tableau Public &middot; מתארח ב-GitHub Pages</p>
+        </footer>
+    </div>
+
+    <script>
+        // האזנה לגלילה והוספת מחלקה ל-Navbar
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 50) navbar.classList.add('scrolled');
+            else navbar.classList.remove('scrolled');
+        });
+
+        // אנימציות חשיפה
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+        // אנימציית חלקיקים ברקע
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function initCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            particles = [];
+            for(let i=0; i<Math.min(50, window.innerWidth/20); i++) {
+                particles.push({
+                    x: Math.random() * canvas.width, 
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.5, 
+                    vy: (Math.random() - 0.5) * 0.5,
+                    size: Math.random() * 2 + 1
+                });
+            }
+        }
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.x += p.vx; 
+                p.y += p.vy;
+                if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
+                
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(139, 92, 246, 0.4)';
+                ctx.fill();
+            });
+            requestAnimationFrame(animateCanvas);
+        }
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+        animateCanvas();
+    </script>
+</body>
+</html>
